@@ -36,7 +36,15 @@ export default async function EditInvoicePage({
   const activeProducts = await db.product.findMany({
     where: { active: true },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, priceCents: true, quantity: true, unit: true, images: true },
+    select: {
+      id: true,
+      name: true,
+      barcode: true,
+      priceCents: true,
+      quantity: true,
+      unit: true,
+      images: true,
+    },
   });
 
   const products = activeProducts

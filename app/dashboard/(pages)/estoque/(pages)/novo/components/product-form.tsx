@@ -19,6 +19,10 @@ export default function ProductForm({ isAdmin }: { isAdmin: boolean }) {
         <Input id="name" name="name" placeholder="Ex: Pastilha de Freio Traseira" required />
       </Field>
 
+      <Field label="Código de barras" htmlFor="barcode" error={state?.errors?.barcode} required>
+        <Input id="barcode" name="barcode" placeholder="Ex: 7891234567890" required />
+      </Field>
+
       <Field label="Prateleira" htmlFor="shelf" error={state?.errors?.shelf} required>
         <Input id="shelf" name="shelf" placeholder="Ex: Prateleira 3, Corredor A" required />
       </Field>

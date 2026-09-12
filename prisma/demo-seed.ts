@@ -10,12 +10,24 @@ import "dotenv/config";
 import { neonConfig } from "@neondatabase/serverless";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
 import ws from "ws";
 
 neonConfig.webSocketConstructor = ws;
 
 const adapter = new PrismaNeon({ connectionString: process.env.DIRECT_URL ?? process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
+
+// Not importing lib/cloudinary.ts here: it's guarded by "server-only", which
+// throws when loaded outside Next's server bundler (e.g. this plain tsx
+// script) — same reason this file uses its own PrismaClient instead of
+// lib/db.ts. Configuring the SDK directly here mirrors that pattern.
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const TODAY = new Date();
@@ -153,13 +165,19 @@ async function main() {
   const BUYER_NAMES = CUSTOMER_NAMES;
 
   // Fictitious photos so the public showroom (and the "click to see details"
-  // gallery/thumbnails) has something to show during a client demo — real
-  // photos get uploaded to Cloudinary later through the normal moto forms.
-  function demoMotoImages(seed: string, count = 4) {
-    return Array.from(
-      { length: count },
-      (_, i) => `https://picsum.photos/seed/jairomotos-${seed}-${i}/900/675`
+  // gallery/thumbnails) has something to show during a client demo. Cloudinary
+  // fetches the placeholder image itself and re-hosts it, so the DB ends up
+  // with a real res.cloudinary.com URL — same storage the real moto/product
+  // photo forms use, not a hotlink to a third-party placeholder service.
+  async function demoMotoImages(seed: string, count = 4) {
+    const uploads = await Promise.all(
+      Array.from({ length: count }, (_, i) =>
+        cloudinary.uploader.upload(`https://picsum.photos/seed/jairomotos-${seed}-${i}/900/675`, {
+          folder: "jairomotos/motorcycles",
+        })
+      )
     );
+    return uploads.map((upload) => upload.secure_url);
   }
 
   const MOTO_DESCRIPTIONS = [
@@ -183,7 +201,7 @@ async function main() {
         model: moto.model,
         year: moto.year,
         color: randomChoice(COLORS),
-        images: demoMotoImages(seed),
+        images: await demoMotoImages(seed),
         description: randomChoice(MOTO_DESCRIPTIONS),
         mileage: randomInt(5000, 45000),
         purchaseCostCents: moto.purchase,

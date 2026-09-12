@@ -30,7 +30,7 @@ export default async function EstoquePage({
 
       <SearchForm
         action="/dashboard/estoque"
-        placeholder="Buscar por nome ou prateleira..."
+        placeholder="Buscar por nome, prateleira ou código de barras..."
         defaultValue={q}
       />
 

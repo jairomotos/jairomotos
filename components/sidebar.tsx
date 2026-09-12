@@ -8,7 +8,7 @@ import {
   Bike,
   FileText,
   Wallet,
-  Receipt,
+  Barcode,
   UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -57,7 +57,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Financeiro",
     items: [
       { href: "/dashboard/financeiro", label: "Financeiro", icon: Wallet, adminOnly: true },
-      { href: "/dashboard/financeiro/boletos", label: "Boletos", icon: Receipt, adminOnly: true },
+      { href: "/dashboard/financeiro/boletos", label: "Boletos", icon: Barcode, adminOnly: true },
     ],
   },
   {

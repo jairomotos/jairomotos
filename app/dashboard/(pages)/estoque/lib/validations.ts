@@ -3,6 +3,7 @@ import { imagesArraySchema } from "@/lib/validations/image";
 
 export const ProductSchema = z.object({
   name: z.string().min(2, { error: "Nome muito curto." }).trim(),
+  barcode: z.string().trim().min(1, { error: "Informe o código de barras." }),
   shelf: z.string().trim().min(1, { error: "Informe a prateleira." }),
   images: imagesArraySchema().optional().default([]),
   costCents: z.coerce.number().int().min(0, { error: "Custo inválido." }),

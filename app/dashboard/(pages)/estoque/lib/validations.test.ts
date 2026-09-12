@@ -4,6 +4,7 @@ import { ProductSchema, StockEntrySchema } from "@/app/dashboard/(pages)/estoque
 describe("ProductSchema", () => {
   const validProduct = {
     name: "Óleo 10W40",
+    barcode: "7891234567890",
     shelf: "Prateleira 3",
     costCents: "1000",
     priceCents: "2000",
@@ -23,6 +24,11 @@ describe("ProductSchema", () => {
 
   it("rejects an empty shelf", () => {
     const result = ProductSchema.safeParse({ ...validProduct, shelf: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects an empty barcode", () => {
+    const result = ProductSchema.safeParse({ ...validProduct, barcode: "" });
     expect(result.success).toBe(false);
   });
 

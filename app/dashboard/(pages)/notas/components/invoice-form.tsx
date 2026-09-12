@@ -11,12 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { formatCentsToBRL } from "@/lib/format";
+import { formatCentsToBRL, normalizeSearchText } from "@/lib/format";
 import type { InvoiceFormState } from "@/app/dashboard/(pages)/notas/lib/validations";
 
 type ProductOption = {
   id: string;
   name: string;
+  barcode: string | null;
   priceCents: number;
   quantity: number;
   unit: string;
@@ -97,7 +98,13 @@ export default function InvoiceForm({
     query.trim().length > 0
       ? products
           .filter((p) => !addedProductIds.has(p.id))
-          .filter((p) => p.name.toLowerCase().includes(query.trim().toLowerCase()))
+          .filter((p) => {
+            const needle = normalizeSearchText(query.trim());
+            return (
+              normalizeSearchText(p.name).includes(needle) ||
+              (p.barcode && normalizeSearchText(p.barcode).includes(needle))
+            );
+          })
           .slice(0, 8)
       : [];
 
@@ -173,7 +180,7 @@ export default function InvoiceForm({
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Buscar produto para adicionar..."
+            placeholder="Buscar por nome ou código de barras..."
             className="pl-9"
             value={query}
             onChange={(e) => {

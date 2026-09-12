@@ -26,6 +26,7 @@ export async function createProduct(
 
   const validated = ProductSchema.safeParse({
     name: formData.get("name"),
+    barcode: formData.get("barcode"),
     shelf: formData.get("shelf"),
     images: formData.getAll("images"),
     // Só administradores definem custo — funcionários não veem nem editam
@@ -38,6 +39,13 @@ export async function createProduct(
 
   if (!validated.success) {
     return { errors: validated.error.flatten().fieldErrors };
+  }
+
+  const existingBarcode = await db.product.findUnique({
+    where: { barcode: validated.data.barcode },
+  });
+  if (existingBarcode) {
+    return { errors: { barcode: ["Já existe um produto cadastrado com este código de barras."] } };
   }
 
   let images: string[];
@@ -88,6 +96,7 @@ export async function updateProduct(
 
   const validated = schema.safeParse({
     name: formData.get("name"),
+    barcode: formData.get("barcode"),
     shelf: formData.get("shelf"),
     ...(isAdmin ? { costCents: formData.get("costCents") } : {}),
     priceCents: formData.get("priceCents"),
@@ -96,6 +105,13 @@ export async function updateProduct(
 
   if (!validated.success) {
     return { errors: validated.error.flatten().fieldErrors };
+  }
+
+  const existingBarcode = await db.product.findUnique({
+    where: { barcode: validated.data.barcode },
+  });
+  if (existingBarcode && existingBarcode.id !== productId) {
+    return { errors: { barcode: ["Já existe um produto cadastrado com este código de barras."] } };
   }
 
   await db.product.update({

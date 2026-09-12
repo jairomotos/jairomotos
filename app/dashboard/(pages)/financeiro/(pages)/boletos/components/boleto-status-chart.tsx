@@ -1,17 +1,17 @@
 "use client";
 
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { formatCentsToBRL } from "@/lib/format";
 import type { BoletoStats } from "@/app/dashboard/(pages)/financeiro/(pages)/boletos/lib/get-boletos";
 
-const SLICES = [
+const BARS = [
   { key: "upcoming", label: "A vencer", color: "var(--color-blue-500)" },
   { key: "dueSoon", label: "Vencendo", color: "var(--color-amber-500)" },
   { key: "overdue", label: "Vencido", color: "var(--color-red-500)" },
 ] as const;
 
-type SliceDatum = {
+type BarDatum = {
   key: string;
   label: string;
   color: string;
@@ -21,7 +21,7 @@ type SliceDatum = {
 
 function ChartTooltip({ active, payload }: TooltipContentProps) {
   if (!active || !payload?.length) return null;
-  const data = payload[0]?.payload as SliceDatum | undefined;
+  const data = payload[0]?.payload as BarDatum | undefined;
   if (!data) return null;
 
   return (
@@ -36,7 +36,7 @@ function ChartTooltip({ active, payload }: TooltipContentProps) {
 }
 
 export function BoletoStatusChart({ stats }: { stats: BoletoStats }) {
-  const data: SliceDatum[] = SLICES.map(({ key, label, color }) => ({
+  const data: BarDatum[] = BARS.map(({ key, label, color }) => ({
     key,
     label,
     color,
@@ -47,57 +47,46 @@ export function BoletoStatusChart({ stats }: { stats: BoletoStats }) {
   const hasData = stats.openCents > 0;
 
   return (
-    <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-      <div className="relative mx-auto h-[220px] w-[220px] shrink-0">
+    <div className="flex flex-col gap-4">
+      <div className="h-55">
         {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                dataKey="amountCents"
-                nameKey="label"
-                innerRadius={64}
-                outerRadius={100}
-                paddingAngle={2}
-                stroke="none"
-              >
+            <BarChart data={data} margin={{ left: 4, right: 8, top: 8, bottom: 0 }}>
+              <CartesianGrid vertical={false} stroke="var(--border)" />
+              <XAxis
+                dataKey="label"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                width={72}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                tickFormatter={formatCentsToBRL}
+              />
+              <Tooltip content={(props) => <ChartTooltip {...props} />} cursor={{ fill: "var(--muted)" }} />
+              <Bar dataKey="amountCents" radius={[6, 6, 0, 0]} maxBarSize={64}>
                 {data.map((entry) => (
                   <Cell key={entry.key} fill={entry.color} />
                 ))}
-              </Pie>
-              <Tooltip content={(props) => <ChartTooltip {...props} />} />
-            </PieChart>
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-dashed border-border p-6 text-center">
+          <div className="flex h-full w-full items-center justify-center rounded-lg border-2 border-dashed border-border p-6 text-center">
             <span className="text-xs text-muted-foreground">Nenhum boleto em aberto</span>
-          </div>
-        )}
-        {hasData && (
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-xs text-muted-foreground">Em aberto</span>
-            <span className="font-heading text-lg font-semibold text-foreground">
-              {formatCentsToBRL(stats.openCents)}
-            </span>
           </div>
         )}
       </div>
 
-      <ul className="flex flex-1 flex-col gap-3">
-        {data.map((entry) => (
-          <li key={entry.key} className="flex items-center justify-between gap-3 text-sm">
-            <span className="flex items-center gap-2 text-foreground">
-              <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: entry.color }} />
-              {entry.label}
-            </span>
-            <span className="text-right text-muted-foreground">
-              <span className="font-medium text-foreground">{formatCentsToBRL(entry.amountCents)}</span>
-              {" · "}
-              {entry.count} boleto{entry.count === 1 ? "" : "s"}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
+        <span className="text-muted-foreground">Total em aberto</span>
+        <span className="font-heading text-lg font-semibold text-foreground">
+          {formatCentsToBRL(stats.openCents)}
+        </span>
+      </div>
     </div>
   );
 }

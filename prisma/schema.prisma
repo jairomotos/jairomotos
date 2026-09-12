@@ -64,6 +64,7 @@ model User {
 model Product {
   id          String   @id @default(cuid())
   sku         String   @unique
+  barcode     String?  @unique
   name        String
   description String?
   shelf       String?

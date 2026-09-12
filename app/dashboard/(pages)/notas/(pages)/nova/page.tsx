@@ -7,7 +7,15 @@ export default async function NewInvoicePage() {
   const products = await db.product.findMany({
     where: { active: true, quantity: { gt: 0 } },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, priceCents: true, quantity: true, unit: true, images: true },
+    select: {
+      id: true,
+      name: true,
+      barcode: true,
+      priceCents: true,
+      quantity: true,
+      unit: true,
+      images: true,
+    },
   });
 
   return (

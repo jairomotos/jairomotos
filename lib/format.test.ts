@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { formatCentsToBRL, parseBRLToCents, formatDate, formatDateTime } from "@/lib/format";
+import {
+  formatCentsToBRL,
+  parseBRLToCents,
+  formatDate,
+  formatDateTime,
+  normalizeSearchText,
+} from "@/lib/format";
 
 describe("formatCentsToBRL", () => {
   it("formats cents as BRL currency", () => {
@@ -34,5 +40,18 @@ describe("formatDate / formatDateTime", () => {
     const result = formatDateTime(new Date(2026, 8, 5, 14, 30));
     expect(result).toContain("05/09/2026");
     expect(result).toContain("14:30");
+  });
+});
+
+describe("normalizeSearchText", () => {
+  it("strips accents", () => {
+    expect(normalizeSearchText("Pastilha de Freio Traseira")).toBe(
+      "pastilha de freio traseira"
+    );
+  });
+
+  it("lowercases and removes diacritics for matching", () => {
+    expect(normalizeSearchText("ÓLEO 10W40")).toBe("oleo 10w40");
+    expect(normalizeSearchText("oleo 10w40")).toBe(normalizeSearchText("ÓLEO 10W40"));
   });
 });

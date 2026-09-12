@@ -33,6 +33,13 @@ export function formatDateTime(date: Date): string {
   }).format(date);
 }
 
+export function normalizeSearchText(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
+}
+
 export function formatRelativeTime(date: Date): string {
   const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);
   if (diffSec < 60) return "agora mesmo";
