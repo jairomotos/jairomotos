@@ -41,11 +41,13 @@ export async function createProduct(
     return { errors: validated.error.flatten().fieldErrors };
   }
 
-  const existingBarcode = await db.product.findUnique({
-    where: { barcode: validated.data.barcode },
-  });
-  if (existingBarcode) {
-    return { errors: { barcode: ["Já existe um produto cadastrado com este código de barras."] } };
+  if (validated.data.barcode) {
+    const existingBarcode = await db.product.findUnique({
+      where: { barcode: validated.data.barcode },
+    });
+    if (existingBarcode) {
+      return { errors: { barcode: ["Já existe um produto cadastrado com este código de barras."] } };
+    }
   }
 
   let images: string[];
@@ -107,11 +109,13 @@ export async function updateProduct(
     return { errors: validated.error.flatten().fieldErrors };
   }
 
-  const existingBarcode = await db.product.findUnique({
-    where: { barcode: validated.data.barcode },
-  });
-  if (existingBarcode && existingBarcode.id !== productId) {
-    return { errors: { barcode: ["Já existe um produto cadastrado com este código de barras."] } };
+  if (validated.data.barcode) {
+    const existingBarcode = await db.product.findUnique({
+      where: { barcode: validated.data.barcode },
+    });
+    if (existingBarcode && existingBarcode.id !== productId) {
+      return { errors: { barcode: ["Já existe um produto cadastrado com este código de barras."] } };
+    }
   }
 
   await db.product.update({

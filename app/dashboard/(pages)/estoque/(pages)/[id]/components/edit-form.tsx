@@ -24,8 +24,8 @@ export default function EditProductForm({
         <Input id="name" name="name" defaultValue={product.name} required />
       </Field>
 
-      <Field label="Código de barras" htmlFor="barcode" error={state?.errors?.barcode} required>
-        <Input id="barcode" name="barcode" defaultValue={product.barcode ?? ""} required />
+      <Field label="Código de barras (opcional)" htmlFor="barcode" error={state?.errors?.barcode}>
+        <Input id="barcode" name="barcode" defaultValue={product.barcode ?? ""} />
       </Field>
 
       <Field label="Prateleira" htmlFor="shelf" error={state?.errors?.shelf} required>

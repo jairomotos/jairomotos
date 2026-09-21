@@ -27,9 +27,15 @@ describe("ProductSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects an empty barcode", () => {
-    const result = ProductSchema.safeParse({ ...validProduct, barcode: "" });
-    expect(result.success).toBe(false);
+  it.each(["", "   ", null])("treats a %j barcode as no barcode", (barcode) => {
+    const result = ProductSchema.safeParse({ ...validProduct, barcode });
+    expect(result.success).toBe(true);
+    expect(result.data?.barcode).toBeNull();
+  });
+
+  it("trims a provided barcode", () => {
+    const result = ProductSchema.safeParse({ ...validProduct, barcode: " 789 " });
+    expect(result.data?.barcode).toBe("789");
   });
 
   it("rejects a negative price", () => {

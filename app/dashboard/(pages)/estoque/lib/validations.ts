@@ -3,7 +3,13 @@ import { imagesArraySchema } from "@/lib/validations/image";
 
 export const ProductSchema = z.object({
   name: z.string().min(2, { error: "Nome muito curto." }).trim(),
-  barcode: z.string().trim().min(1, { error: "Informe o código de barras." }),
+  // Opcional: vazio vira null (e não ""), senão o índice único do banco
+  // rejeitaria o segundo produto sem código de barras.
+  barcode: z
+    .string()
+    .trim()
+    .nullish()
+    .transform((value) => value || null),
   shelf: z.string().trim().min(1, { error: "Informe a prateleira." }),
   images: imagesArraySchema().optional().default([]),
   costCents: z.coerce.number().int().min(0, { error: "Custo inválido." }),
