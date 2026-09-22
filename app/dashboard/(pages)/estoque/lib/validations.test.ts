@@ -22,9 +22,10 @@ describe("ProductSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects an empty shelf", () => {
-    const result = ProductSchema.safeParse({ ...validProduct, shelf: "" });
-    expect(result.success).toBe(false);
+  it.each(["", "   ", null])("treats a %j shelf as no shelf", (shelf) => {
+    const result = ProductSchema.safeParse({ ...validProduct, shelf });
+    expect(result.success).toBe(true);
+    expect(result.data?.shelf).toBeNull();
   });
 
   it.each(["", "   ", null])("treats a %j barcode as no barcode", (barcode) => {

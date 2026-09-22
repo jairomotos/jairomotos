@@ -23,8 +23,8 @@ export default function ProductForm({ isAdmin }: { isAdmin: boolean }) {
         <Input id="barcode" name="barcode" placeholder="Ex: 7891234567890" />
       </Field>
 
-      <Field label="Prateleira" htmlFor="shelf" error={state?.errors?.shelf} required>
-        <Input id="shelf" name="shelf" placeholder="Ex: Prateleira 3, Corredor A" required />
+      <Field label="Prateleira (opcional)" htmlFor="shelf" error={state?.errors?.shelf}>
+        <Input id="shelf" name="shelf" placeholder="Ex: Prateleira 3, Corredor A" />
       </Field>
 
       <div className={isAdmin ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : undefined}>

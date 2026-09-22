@@ -10,7 +10,11 @@ export const ProductSchema = z.object({
     .trim()
     .nullish()
     .transform((value) => value || null),
-  shelf: z.string().trim().min(1, { error: "Informe a prateleira." }),
+  shelf: z
+    .string()
+    .trim()
+    .nullish()
+    .transform((value) => value || null),
   images: imagesArraySchema().optional().default([]),
   costCents: z.coerce.number().int().min(0, { error: "Custo inválido." }),
   priceCents: z.coerce.number().int().min(1, { error: "Preço inválido." }),

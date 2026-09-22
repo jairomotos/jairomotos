@@ -31,7 +31,7 @@ export default async function ProductDetailPage({
           {product.name}
         </h1>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-          {product.shelf} · Estoque atual:{" "}
+          {product.shelf && `${product.shelf} · `}Estoque atual:{" "}
           <span
             className={
               low
