@@ -39,6 +39,29 @@ describe("ProductSchema", () => {
     expect(result.data?.barcode).toBe("789");
   });
 
+  it("requires only name and quantity — cost, price and min stock default to 0", () => {
+    const result = ProductSchema.safeParse({ name: "Óleo 10W40", quantity: "10" });
+    expect(result.success).toBe(true);
+    expect(result.data).toMatchObject({
+      barcode: null,
+      shelf: null,
+      costCents: 0,
+      priceCents: 0,
+      minStock: 0,
+      quantity: 10,
+    });
+  });
+
+  it("treats empty cost, price and min stock as 0", () => {
+    const result = ProductSchema.safeParse({ ...validProduct, costCents: "", priceCents: "", minStock: "" });
+    expect(result.success).toBe(true);
+    expect(result.data).toMatchObject({ costCents: 0, priceCents: 0, minStock: 0 });
+  });
+
+  it("still requires a quantity", () => {
+    expect(ProductSchema.safeParse({ ...validProduct, quantity: undefined }).success).toBe(false);
+  });
+
   it("rejects a negative price", () => {
     const result = ProductSchema.safeParse({ ...validProduct, priceCents: "-5" });
     expect(result.success).toBe(false);

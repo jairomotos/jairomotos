@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DeleteProductButton } from "@/app/dashboard/(pages)/estoque/components/delete-product-button";
 import type { getProducts } from "@/app/dashboard/(pages)/estoque/lib/get-products";
 
 export function ProductsTable({
@@ -37,6 +38,7 @@ export function ProductsTable({
               {isAdmin && <TableHead className="text-right">Custo</TableHead>}
               <TableHead className="text-right">Preço</TableHead>
               <TableHead className="text-right">Estoque</TableHead>
+              {isAdmin && <TableHead className="w-14"></TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -89,6 +91,11 @@ export function ProductsTable({
                       {product.quantity} {product.unit}
                     </span>
                   </TableCell>
+                  {isAdmin && (
+                    <TableCell>
+                      <DeleteProductButton productId={product.id} productName={product.name} />
+                    </TableCell>
+                  )}
                 </ClickableRow>
               );
             })}

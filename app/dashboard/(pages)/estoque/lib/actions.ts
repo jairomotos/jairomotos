@@ -160,6 +160,28 @@ export async function updateProductImages(
   return { message: "Fotos atualizadas com sucesso." };
 }
 
+export async function deleteProduct(productId: string) {
+  const session = await verifySession();
+  if (session.role !== "ADMIN") {
+    return { success: false, message: "Apenas administradores podem excluir produtos." };
+  }
+
+  // Exclusão lógica: notas e movimentações antigas continuam apontando para o
+  // produto (FK Restrict), então ele só sai das listagens. O código de barras
+  // é liberado para poder ser reaproveitado em um novo cadastro.
+  const { count } = await db.product.updateMany({
+    where: { id: productId, active: true },
+    data: { active: false, barcode: null },
+  });
+  if (count === 0) {
+    return { success: false, message: "Produto não encontrado." };
+  }
+
+  revalidatePath("/dashboard/estoque");
+  revalidatePath("/dashboard");
+  return { success: true, message: "Produto excluído." };
+}
+
 export async function registerStockMovement(
   _state: StockEntryState,
   formData: FormData

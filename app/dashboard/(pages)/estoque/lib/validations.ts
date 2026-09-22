@@ -16,10 +16,11 @@ export const ProductSchema = z.object({
     .nullish()
     .transform((value) => value || null),
   images: imagesArraySchema().optional().default([]),
-  costCents: z.coerce.number().int().min(0, { error: "Custo inválido." }),
-  priceCents: z.coerce.number().int().min(1, { error: "Preço inválido." }),
+  // Custo, preço e estoque mínimo são opcionais: sem valor, ficam em 0.
+  costCents: z.coerce.number().int().min(0, { error: "Custo inválido." }).default(0),
+  priceCents: z.coerce.number().int().min(0, { error: "Preço inválido." }).default(0),
   quantity: z.coerce.number().int().min(0, { error: "Quantidade inválida." }),
-  minStock: z.coerce.number().int().min(0, { error: "Estoque mínimo inválido." }),
+  minStock: z.coerce.number().int().min(0, { error: "Estoque mínimo inválido." }).default(0),
 });
 
 export type ProductFormState =

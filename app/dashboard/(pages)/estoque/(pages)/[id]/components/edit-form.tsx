@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import type { Product } from "@prisma/client";
 import { Save } from "lucide-react";
 import { updateProduct } from "@/app/dashboard/(pages)/estoque/lib/actions";
+import { keepFormValues } from "@/lib/keep-form-values";
 import { Field, CurrencyInput, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ export default function EditProductForm({
   const [state, formAction, pending] = useActionState(action, undefined);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form onSubmit={keepFormValues(formAction)} className="flex flex-col gap-4">
       <Field label="Nome" htmlFor="name" error={state?.errors?.name} required>
         <Input id="name" name="name" defaultValue={product.name} required />
       </Field>
@@ -34,23 +35,22 @@ export default function EditProductForm({
 
       <div className={isAdmin ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : undefined}>
         {isAdmin && (
-          <Field label="Custo (R$)" htmlFor="costCents" error={state?.errors?.costCents} required>
-            <CurrencyInput id="costCents" name="costCents" defaultValueCents={product.costCents} required />
+          <Field label="Custo (R$, opcional)" htmlFor="costCents" error={state?.errors?.costCents}>
+            <CurrencyInput id="costCents" name="costCents" defaultValueCents={product.costCents} />
           </Field>
         )}
-        <Field label="Preço de venda (R$)" htmlFor="priceCents" error={state?.errors?.priceCents} required>
-          <CurrencyInput id="priceCents" name="priceCents" defaultValueCents={product.priceCents} required />
+        <Field label="Preço de venda (R$, opcional)" htmlFor="priceCents" error={state?.errors?.priceCents}>
+          <CurrencyInput id="priceCents" name="priceCents" defaultValueCents={product.priceCents} />
         </Field>
       </div>
 
-      <Field label="Estoque mínimo" htmlFor="minStock" error={state?.errors?.minStock} required>
+      <Field label="Estoque mínimo (opcional)" htmlFor="minStock" error={state?.errors?.minStock}>
         <Input
           id="minStock"
           name="minStock"
           type="number"
           min="0"
           defaultValue={product.minStock}
-          required
         />
       </Field>
 
