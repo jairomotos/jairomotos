@@ -3,7 +3,41 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { ImageIcon, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { MAX_IMAGES } from "@/lib/validations/image";
+
+function ImageLightbox({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
+  return (
+    <Dialog>
+      <DialogTrigger
+        type="button"
+        className={cn("block cursor-zoom-in", className)}
+        aria-label={`Ampliar ${alt}`}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={alt} className="size-full object-cover" />
+      </DialogTrigger>
+      <DialogContent className="max-w-3xl border-none bg-transparent p-0 ring-0 sm:max-w-3xl">
+        <DialogTitle className="sr-only">{alt}</DialogTitle>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={alt}
+          className="max-h-[85vh] w-full rounded-xl object-contain"
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 async function fileToCompressedDataUrl(file: File, maxDimension = 640, quality = 0.75) {
   const bitmap = await createImageBitmap(file);
@@ -61,8 +95,7 @@ export function ImageUpload({
     <div className="flex flex-col items-center gap-3">
       <div className="relative flex size-40 items-center justify-center overflow-hidden rounded-xl border border-dashed border-border bg-muted">
         {preview ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="Foto do produto" className="size-full object-cover" />
+          <ImageLightbox src={preview} alt="Foto do produto" className="size-full" />
         ) : (
           <ImageIcon className="size-10 text-muted-foreground/40" />
         )}
@@ -158,8 +191,7 @@ export function MultiImageUpload({
             key={index}
             className="relative size-28 shrink-0 overflow-hidden rounded-xl border border-border bg-muted"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt={`Foto ${index + 1}`} className="size-full object-cover" />
+            <ImageLightbox src={src} alt={`Foto ${index + 1}`} className="size-full" />
             <input type="hidden" name={name} value={src} />
             <Button
               type="button"
